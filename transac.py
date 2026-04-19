@@ -45,23 +45,25 @@ class Transaction:
 
 
     def verify_nonce(self, blockchain, mempool):
-        # scan backwards to find latest transaction from this sender
+        # Calculate how many tx from this sender are already in mempool
+        # (Excluding self)
+        pending_others = 0
+        for t in mempool:
+            if t.sender == self.sender and t is not self:
+                pending_others += 1
+
         for block in reversed(blockchain.chain):
             for tx in block.transactions:
-                if tx.sender == self.sender:
-                    confirmed = tx.nonce
-                    expected_nonce = confirmed + 1 + sum(
-                        1 for t in mempool
-                        if t.sender == self.sender and t is not self
-                    )
-                    return self.nonce == expected_nonce
+                # Handle both Transaction objects and network dictionaries
+                curr_sender = tx.sender if hasattr(tx, 'sender') else tx['sender']
+                curr_nonce = tx.nonce if hasattr(tx, 'nonce') else tx['nonce']
+                
+                if curr_sender == self.sender:
+                    return self.nonce == curr_nonce + 1 + pending_others
 
-        # if sender has no previous transactions
-        expected_nonce = 0 + sum(
-            1 for t in mempool if t.sender == self.sender
-        )
-
-        return self.nonce == expected_nonce
+        # Sender has no transactions in the chain yet
+        # Expected = 0 (for first ever tx) + Pending in Pool
+        return self.nonce == 0 + pending_others
 
 
     def verify_signature(self):

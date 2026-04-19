@@ -9,7 +9,7 @@ class Block:
         self.index = index
         self.transactions = transactions
         self.previous_hash = previous_hash
-        self.current_hash = None
+        self.current_hash = self.compute_current_hash()
 
     def compute_current_hash(self):
         block_dict = self.to_dict()
@@ -32,6 +32,8 @@ class Block:
 
     def get_hash(self):
         return self.current_hash
+    
+
 
 
 class Blockchain:
@@ -51,11 +53,8 @@ class Blockchain:
         if not self.validate_block(block, mempool):
             return False
 
-        # compute hash BEFORE appending
-        block.current_hash = block.compute_current_hash()
         self.chain.append(block)
 
-        # 🔥 SPEC: update state after block is accepted
         self._update_mempool(block, mempool)
 
         return True
@@ -71,23 +70,38 @@ class Blockchain:
         if block.previous_hash != last_block.current_hash:
             return False
 
-        #validate all transactions
-        if not isinstance(block.transactions, list):
-            return False
+        #validate all transactions in block
+        processed_txs = []
+        for tx_data in block.transactions:
+            if isinstance(tx_data, dict):
+                # Convert dict from network to Transaction object
+                tx_obj = Transaction(
+                    sender=tx_data["sender"],
+                    message=tx_data["message"],
+                    nonce=tx_data["nonce"],
+                    signature=tx_data["signature"]
+                )
+            else:
+                tx_obj = tx_data
+            
+            # Now tx_obj is guaranteed to have .is_valid()
+            if not tx_obj.is_valid(self, mempool):
+                return False
+            processed_txs.append(tx_obj)
 
-        for tx in block.transactions:
-            if not isinstance(tx, Transaction):
-                return False
-            if not tx.is_valid(self, mempool):
-                return False
+        # Update block with transaction objects
+        block.transactions = processed_txs
+            
+        #validate that the block's current_hash was computed honestly
+        if block.current_hash != block.compute_current_hash():
+            return False
 
         return True
 
     def _update_mempool(self, block: Block, mempool: List[Transaction]):
-
         # remove confirmed transactions
-        confirmed_set = set(block.transactions)
-        mempool[:] = [tx for tx in mempool if tx not in confirmed_set]
+        confirmed_sigs = {tx.signature for tx in block.transactions}
+        mempool[:] = [tx for tx in mempool if tx.signature not in confirmed_sigs]
 
         valid_remaining = []
 
@@ -100,4 +114,3 @@ class Blockchain:
     def get_last_block(self) -> Block:
         return self.chain[-1]
 
-#section 3.2 last part not done yet
