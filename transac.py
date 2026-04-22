@@ -1,6 +1,5 @@
-import ed25519
-from block import Blockchain
-
+from nacl.signing import VerifyKey
+from nacl.exceptions import BadSignatureError
 
 class Transaction:
     def __init__(self, sender: str, message: str, nonce: int, signature: str):
@@ -73,10 +72,14 @@ class Transaction:
             public_key_bytes = bytes.fromhex(self.sender)
             signature_bytes = bytes.fromhex(self.signature)
 
-            vk = ed25519.VerifyingKey(public_key_bytes)
-            vk.verify(signature_bytes, msg_bytes)
+            vk = VerifyKey(public_key_bytes)
+            vk.verify(msg_bytes, signature_bytes)
 
             return True
+
+        except BadSignatureError:
+            print("invalid signature")
+            return False
         except Exception:
             print("error from transac verify_signature")
             return False

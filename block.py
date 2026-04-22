@@ -2,7 +2,7 @@ import json
 from typing import List
 from transac import Transaction
 import hashlib
-
+import sys
 
 class Block:
     def __init__(self, index: int, transactions: List[Transaction], previous_hash: str) -> None:
@@ -65,28 +65,14 @@ class Blockchain:
         #index check
         if block.index != last_block.index + 1:
             return False
-
         #hash linkage
         if block.previous_hash != last_block.current_hash:
             return False
-
         #validate all transactions in block
         processed_txs = []
-        for tx_data in block.transactions:
-            if isinstance(tx_data, dict):
-                # Convert dict from network to Transaction object
-                tx_obj = Transaction(
-                    sender=tx_data["sender"],
-                    message=tx_data["message"],
-                    nonce=tx_data["nonce"],
-                    signature=tx_data["signature"]
-                )
-            else:
-                tx_obj = tx_data
-            
-            # Now tx_obj is guaranteed to have .is_valid()
-            if not tx_obj.is_valid(self, mempool):
-                return False
+        for tx_obj in block.transactions:
+            if not isinstance(tx_obj, Transaction):
+                sys.exit(1)
             processed_txs.append(tx_obj)
 
         # Update block with transaction objects
