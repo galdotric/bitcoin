@@ -23,8 +23,7 @@ class Node:
 
         return False
 
-    def handle_values(self, payload):
-        # ensure we have a proposal
+    def handle_values(self):
         if self.current_proposal is None:
             self.create_block()
 
@@ -127,16 +126,9 @@ class Node:
     def decide_on_block(self, proposals):
         if not proposals:
             return None
-
-        # Filter: If at least one block has transactions, ignore empty ones
         non_empty_blocks = [b for b in proposals if len(b.transactions) > 0]
-        
         candidate_pool = non_empty_blocks if non_empty_blocks else proposals
-
-        # Tie-breaker: Lexicographical smallest current_hash
-        # .get_hash() should return the hex string
         decided_block = min(candidate_pool, key=lambda b: b.get_hash())
-        
         return decided_block
     
 def _recv_msg(sock):

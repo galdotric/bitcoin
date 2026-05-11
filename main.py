@@ -49,7 +49,7 @@ def main():
                 # Don't add ourselves as a peer
                 if not ((peer_host == '127.0.0.1' or peer_host == 'localhost') and peer_port == port):
                     peers.append((peer_host, peer_port))
-                #give node access to peers
+                #gives node access to peers in handle_transaction method of Node class
                 node.peers = peers
 
     server_thread = threading.Thread(target=server_loop, args=(port, node), daemon=True)
