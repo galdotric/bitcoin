@@ -1,0 +1,29 @@
+
+Gathering node ports...
+	Found node on port: 5000
+	Found node on port: 5001
+	Found node on port: 5002
+
+Starting blockchain nodes...
+	Starting node 1 on port 5000
+	-> Node 1 started (PID: 57)
+	Starting node 2 on port 5001
+	-> Node 2 started (PID: 58)
+	Starting node 3 on port 5002
+	-> Node 3 started (PID: 60)
+
+Waiting for nodes to start accepting connections...
+	Checking port 5000...
+	-> Port 5000 not ready, attempt 1/2
+	-> Port 5000 is ready
+	Checking port 5001...
+	-> Port 5001 is ready
+	Checking port 5002...
+	-> Port 5002 is ready
+
+Checking for node-specific inputs...
+	-> Using single input file for all nodes
+
+Processing single input file
+
+Waiting for consensus to be reached...
