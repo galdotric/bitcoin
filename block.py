@@ -33,6 +33,14 @@ class Block:
     def get_hash(self):
         return self.current_hash
     
+    def from_dict(block_dict):
+        transactions = [Transaction.from_dict(tx_dict) for tx_dict in block_dict["transactions"]]
+        return Block(
+            index=block_dict["index"],
+            transactions=transactions,
+            previous_hash=block_dict["previous_hash"]
+        )
+    
 
 
 

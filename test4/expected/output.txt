@@ -1,0 +1,24 @@
+--- Node 1 ---
+{
+  "payload": {
+    "message": "Single tx partial credit",
+    "nonce": 0,
+    "sender": "b6b84f3153b892ad9ff103ad879ebe7eabe4fe66f26e7152957c021fc1931596",
+    "signature": "d29549ec17fe4b54fee91e02d4ddcd6cc8993c87fb1851cf03e8cf3c7e1f64d1564d50d61fb0674597e78915e4a70bf6dca1c34cf09e710fb8a87d672aa5cf08"
+  },
+  "type": "transaction"
+}
+{
+  "current_hash": "91cf19a30b30c07934320818cea48145bdc1c1502c4a0d670cb193dc41e39a02",
+  "index": 2,
+  "previous_hash": "70debc4f2a57a62784f0d762bda910eb8a3bad8b1ebc4ffd642401a8305a768d",
+  "transactions": [
+    {
+      "message": "Single tx partial credit",
+      "nonce": 0,
+      "sender": "b6b84f3153b892ad9ff103ad879ebe7eabe4fe66f26e7152957c021fc1931596",
+      "signature": "d29549ec17fe4b54fee91e02d4ddcd6cc8993c87fb1851cf03e8cf3c7e1f64d1564d50d61fb0674597e78915e4a70bf6dca1c34cf09e710fb8a87d672aa5cf08"
+    }
+  ]
+}
+

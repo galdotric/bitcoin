@@ -1,0 +1,11 @@
+[
+  {
+    "type": "transaction",
+    "payload": {
+      "sender": "b6b84f3153b892ad9ff103ad879ebe7eabe4fe66f26e7152957c021fc1931596",
+      "message": "Single tx partial credit",
+      "nonce": 0,
+      "signature": "d29549ec17fe4b54fee91e02d4ddcd6cc8993c87fb1851cf03e8cf3c7e1f64d1564d50d61fb0674597e78915e4a70bf6dca1c34cf09e710fb8a87d672aa5cf08"
+    }
+  }
+]

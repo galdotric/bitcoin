@@ -1,5 +1,6 @@
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
+import json
 
 class Transaction:
     def __init__(self, sender: str, message: str, nonce: int, signature: str):
@@ -67,7 +68,16 @@ class Transaction:
 
     def verify_signature(self):
         try:
-            msg_bytes = f"{self.sender}{self.message}{self.nonce}".encode()
+            tx_to_verify = {
+                "sender": self.sender,
+                "message": self.message,
+                "nonce": self.nonce
+            }
+
+            msg_bytes = json.dumps(
+                tx_to_verify,
+                sort_keys=True
+            ).encode("utf-8")
 
             public_key_bytes = bytes.fromhex(self.sender)
             signature_bytes = bytes.fromhex(self.signature)
@@ -78,12 +88,10 @@ class Transaction:
             return True
 
         except BadSignatureError:
-            print("invalid signature")
             return False
-        except Exception:
-            print("error from transac verify_signature")
+        except Exception as e:
+            print("error from transac verify_signature:", e)
             return False
-
 
 
     def is_valid(self, blockchain, mempool):

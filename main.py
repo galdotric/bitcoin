@@ -1,34 +1,67 @@
+import socket
+import threading
+import json
 import sys
 import time
-from node import Node # Assuming your Node class is in node.py
+from node import Node
+
+def handle_client(conn, addr, node):
+    try:
+        from node import _recv_msg, _send_msg
+
+        msg = _recv_msg(conn)
+        if msg:
+            response = node.handle_node_msg(msg)
+
+            # only send response if Node returns something
+            if response is not None:
+                _send_msg(conn, response)
+
+    except Exception as e:
+        print(f"Error handling connection from {addr}: {e}")
+    finally:
+        conn.close()
+
+def server_loop(port, node):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(('0.0.0.0', port))
+        s.listen(5)
+        while True:
+            conn, addr = s.accept()
+            threading.Thread(target=handle_client, args=(conn, addr, node), daemon=True).start()
 
 def main():
-    # 1. Parse command line arguments provided by the autograder's Run.sh
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         print("Usage: python3 main.py <Port-Server> <Node-List-File>")
         sys.exit(1)
 
     port = int(sys.argv[1])
-    peer_file = sys.argv[2]
+    node_list_file = sys.argv[2]
+    peers = []
+    node = Node()
+    with open(node_list_file, 'r') as f:
+        for line in f:
+            parts = line.strip().split()
+            if parts:
+                peer_host, peer_port = line.strip().split(':')
+                peer_port = int(peer_port)
+                # Don't add ourselves as a peer
+                if not ((peer_host == '127.0.0.1' or peer_host == 'localhost') and peer_port == port):
+                    peers.append((peer_host, peer_port))
+                #give node access to peers
+                node.peers = peers
 
-    # For local testing and the autograder, the host is typically localhost
-    node_address = f"127.0.0.1:{port}"
+    server_thread = threading.Thread(target=server_loop, args=(port, node), daemon=True)
+    server_thread.start()
 
-    # 2. Initialize the Node with the parsed arguments
-    my_node = Node(node_address=node_address, peer_file=peer_file)
 
-    # 3. Start the node (this should spin up the Server thread and Consensus thread)
-    my_node.start()
-
-    # 4. Keep the main thread alive. 
-    # Because your server and consensus loops should be running in daemon threads,
-    # if the main thread exits, the whole program shuts down.
+    # Main loop: Trigger consensus when transactions arrive or on a timer
     try:
         while True:
-            time.sleep(1) # Sleep to prevent high CPU usage
+            time.sleep(1)
     except KeyboardInterrupt:
-        print("\nShutting down node...")
-        sys.exit(0)
+        return
 
 if __name__ == "__main__":
     main()
