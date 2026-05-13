@@ -107,4 +107,3 @@ class Blockchain:
 
     def get_last_block(self) -> Block:
         return self.chain[-1]
-

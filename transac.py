@@ -90,7 +90,6 @@ class Transaction:
         except BadSignatureError:
             return False
         except Exception as e:
-            print("error from transac verify_signature:", e)
             return False
 
 
@@ -111,3 +110,11 @@ class Transaction:
             "nonce": self.nonce,
             "signature": self.signature
         }
+
+    def from_dict(tx_dict):
+        return Transaction(
+            message=tx_dict["message"],
+            nonce=tx_dict["nonce"],
+            sender=tx_dict["sender"],
+            signature=tx_dict["signature"]
+        )
